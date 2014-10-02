@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -14,6 +15,7 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG;
 
+import edu.wildlifesecurity.framework.SurveillanceClientManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,8 +35,10 @@ public class TrapDevice extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_trap_device);
-	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	    bgSub=new BackgroundSubtractorMOG();
+	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
+	    
+	    SurveillanceClientManager manager = new SurveillanceClientManager(null, null, null, null);
+	    /*bgSub=new BackgroundSubtractorMOG();
 	    setupCamera();
 	    image=Mat.eye(3,3,0);
 		mCamera.grab();
@@ -49,7 +53,7 @@ public class TrapDevice extends Activity {
 		ImageView iv = (ImageView) findViewById(R.id.imageView1);
 		iv.setImageBitmap(bm);
 
-		//setContentView(R.layout.activity_trap_device);
+		//setContentView(R.layout.activity_trap_device);*/
 	    
 
 	    

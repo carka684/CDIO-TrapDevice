@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Trapdevice.fetchFramework" default="fetchFramework" basedir=".">
+  <target name ="fetchFramework" description="Fetches the latest build of Framework">
+  	<ant antfile="../CDIO-Framework/build.xml" target="makejar" dir="../CDIO-Framework" />
+    <copy file="../CDIO-Framework/Framework.jar" todir="libs" />
+  </target>
+</project>
