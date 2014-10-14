@@ -15,7 +15,11 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG;
 
+import edu.wildlife.trapdevice.mediasource.impl.AndroidMediaSource;
+import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.SurveillanceClientManager;
+import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,21 +29,32 @@ import android.widget.TextView;
 
 public class TrapDevice extends Activity {
 
-	VideoCapture mCamera;
-	Mat image;
-	BackgroundSubtractorMOG bgSub;
-	
-
-    
+	private VideoCapture mCamera;
+	private Mat image;
+ 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_trap_device);
-	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
+	    //System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
 	    
-	    SurveillanceClientManager manager = new SurveillanceClientManager(null, null, null, null);
-	    /*bgSub=new BackgroundSubtractorMOG();
-	    setupCamera();
+	    IMediaSource mediaSource = new AndroidMediaSource();
+	    mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+
+			@Override
+			public void handle(MediaEvent event) {
+				Bitmap bm = Bitmap.createBitmap(event.getImage().cols(), event.getImage().rows(),	Bitmap.Config.ARGB_8888);
+				Utils.matToBitmap(event.getImage(), bm);
+				ImageView iv = (ImageView) findViewById(R.id.imageView1);
+				iv.setImageBitmap(bm);
+			}
+	    	
+	    });
+	    
+	    SurveillanceClientManager manager = new SurveillanceClientManager(mediaSource, null, null, null);
+	    manager.start();
+
+	    /*setupCamera();
 	    image=Mat.eye(3,3,0);
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
@@ -53,34 +68,12 @@ public class TrapDevice extends Activity {
 		ImageView iv = (ImageView) findViewById(R.id.imageView1);
 		iv.setImageBitmap(bm);
 
-		//setContentView(R.layout.activity_trap_device);*/
+		setContentView(R.layout.activity_trap_device);*/
 	    
 
 	    
 	}
 	
-	public void snapShotGray(View view){
-		mCamera.grab();
-		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
-		Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);		
-		Bitmap bm = Bitmap.createBitmap(image.cols(), image.rows(),	Bitmap.Config.ARGB_8888);
-		Utils.matToBitmap(image, bm);
-		ImageView iv = (ImageView) findViewById(R.id.imageView1);
-		iv.setImageBitmap(bm);
-		
-	}
-	
-	public void snapShot(View view){
-		mCamera.grab();
-		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
-		Bitmap bm = Bitmap.createBitmap(image.cols(), image.rows(),	Bitmap.Config.ARGB_8888);
-		Utils.matToBitmap(image, bm);
-		ImageView iv = (ImageView) findViewById(R.id.imageView1);
-		iv.setImageBitmap(bm);
-		
-	}
-
-
 	private void setupCamera() {
 		 
 	    if (mCamera != null) {
@@ -101,8 +94,19 @@ public class TrapDevice extends Activity {
 	        }
 	    }
 	 
-	mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mPreviewSize.width);
-	mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mPreviewSize.height);
+		mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mPreviewSize.width);
+		mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mPreviewSize.height);
+	}
+	
+	public void snapShotGray(View view){
+		mCamera.grab();
+		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
+		Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);		
+		Bitmap bm = Bitmap.createBitmap(image.cols(), image.rows(),	Bitmap.Config.ARGB_8888);
+		Utils.matToBitmap(image, bm);
+		ImageView iv = (ImageView) findViewById(R.id.imageView1);
+		iv.setImageBitmap(bm);
+		
 	}
 	
 	@Override
