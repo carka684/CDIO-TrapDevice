@@ -1,6 +1,8 @@
 package edu.wildlife.trapdevice.mediasource.impl;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
@@ -27,15 +29,24 @@ public class AndroidMediaSource extends AbstractComponent implements
 		IMediaSource {
 
 	private EventDispatcher<MediaEvent> dispatcher = new EventDispatcher<MediaEvent>();
+	
 	private VideoCapture mCamera;
 	private Mat image;
 	
+	private Timer timer = new Timer();
+	
 	@Override
 	public void init(){
+		// Sets up the camera
 		setupCamera();
-		image=Mat.eye(3,3,0);
-		mCamera.grab();
-		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
+		
+		// Starts timer to take pictures at a configurable rate
+		timer.scheduleAtFixedRate(new TimerTask() {
+			  @Override
+			  public void run() {
+			    takeSnapshot();
+			  }
+			}, (Integer)configuration.get("MediaSource_FrameRate"), (Integer)configuration.get("MediaSource_FrameRate"));
 	}
 	
 	@Override
@@ -46,31 +57,20 @@ public class AndroidMediaSource extends AbstractComponent implements
 
 	@Override
 	public Mat takeSnapshot() {
-		// TODO Auto-generated method stub
 		snapShotGray();
 		dispatcher.dispatch(new MediaEvent(MediaEvent.NEW_SNAPSHOT, image));
 		return image;
 	}
 	
-	public void snapShotGray(){
+	private void snapShotGray(){
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
-		Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);		
-		//Bitmap bm = Bitmap.createBitmap(image.cols(), image.rows(),	Bitmap.Config.ARGB_8888);
-		//Utils.matToBitmap(image, bm);
-		//ImageView iv = (ImageView) findViewById(R.id.imageView1);
-		//iv.setImageBitmap(bm);
-		
+		Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);	
 	}
 	
-	public void snapShot(View view){
+	private void snapShot(View view){
 		mCamera.grab();
-		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
-		//Bitmap bm = Bitmap.createBitmap(image.cols(), image.rows(),	Bitmap.Config.ARGB_8888);
-		//Utils.matToBitmap(image, bm);
-		//ImageView iv = (ImageView) findViewById(R.id.imageView1);
-		//iv.setImageBitmap(bm);
-		
+		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);		
 	}
 
 	private void setupCamera() {
@@ -95,6 +95,11 @@ public class AndroidMediaSource extends AbstractComponent implements
 	 
 		mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mPreviewSize.width);
 		mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mPreviewSize.height);
+		
+		// Don't know why needed but must be done...
+		image=Mat.eye(3,3,0);
+		mCamera.grab();
+		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
 	}
 
 

@@ -42,11 +42,21 @@ public class TrapDevice extends Activity {
 	    mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 
 			@Override
-			public void handle(MediaEvent event) {
-				Bitmap bm = Bitmap.createBitmap(event.getImage().cols(), event.getImage().rows(),	Bitmap.Config.ARGB_8888);
-				Utils.matToBitmap(event.getImage(), bm);
-				ImageView iv = (ImageView) findViewById(R.id.imageView1);
-				iv.setImageBitmap(bm);
+			public void handle(final MediaEvent event) {
+				
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						Bitmap bm = Bitmap.createBitmap(event.getImage().cols(), event.getImage().rows(),	Bitmap.Config.ARGB_8888);
+						Utils.matToBitmap(event.getImage(), bm);
+						ImageView iv = (ImageView) findViewById(R.id.imageView1);
+						iv.setImageBitmap(bm);
+					}
+
+				});
+
 			}
 	    	
 	    });
