@@ -14,9 +14,6 @@ import org.opencv.imgproc.Imgproc;
 import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
-
-import com.example.trapdevice.R;
-
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
@@ -24,6 +21,7 @@ import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
+import edu.wildlifesecurity.trapdevice.R;
 
 public class AndroidMediaSource extends AbstractComponent implements
 		IMediaSource {
@@ -45,6 +43,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 			  @Override
 			  public void run() {
 			    takeSnapshot();
+			    System.out.println("Took photo");
 			  }
 			}, (Integer)configuration.get("MediaSource_FrameRate"), (Integer)configuration.get("MediaSource_FrameRate"));
 	}
@@ -100,6 +99,14 @@ public class AndroidMediaSource extends AbstractComponent implements
 		image=Mat.eye(3,3,0);
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
+	}
+
+	@Override
+	public void destroy() {
+		timer.cancel();
+		timer.purge();
+		
+		mCamera.release();
 	}
 
 
