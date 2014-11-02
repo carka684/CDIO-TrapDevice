@@ -1,5 +1,9 @@
 package edu.wildlifesecurity.trapdevice;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import edu.wildlife.trapdevice.mediasource.impl.AndroidMediaSource;
 import edu.wildlifesecurity.framework.SurveillanceClientManager;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
@@ -8,10 +12,13 @@ import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 public class SurveillanceService extends Service {
@@ -42,7 +49,14 @@ public class SurveillanceService extends Service {
 		mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
-		communicator = null;
+		communicator =  new Communicator();
+		
+		// Load communicator pre configuration
+		Map<String,Object> preconfig = new HashMap<String,Object>();
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		for(Entry<String, ?> entry : sharedPref.getAll().entrySet())
+			preconfig.put(entry.getKey(), entry.getValue());
+		communicator.loadConfiguration(preconfig);
 		
 		// Create manager
 		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator);

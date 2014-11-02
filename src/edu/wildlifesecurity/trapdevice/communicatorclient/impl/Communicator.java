@@ -3,8 +3,11 @@ package edu.wildlifesecurity.trapdevice.communicatorclient.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventType;
@@ -17,15 +20,17 @@ import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 public class Communicator extends AbstractComponent implements
 		ICommunicatorClient {
 	
-	private IChannel channel;
+	private AbstractChannel channel;
 
 	@Override
 	public void init(){
 		
 		try {
 			
-			// Read from configuration which channels to use
-			channel = (IChannel) Class.forName(configuration.get("CommunicatorServer_Channel").toString()).newInstance();
+			// Read from android configuration which channel to use
+			Class<?> cl = Class.forName(configuration.get("CommunicatorClient_Channel").toString());
+			Constructor<?> cons = cl.getConstructor(Map.class);
+			channel = (AbstractChannel) cons.newInstance(configuration);
 		
 			// Start try to connect to server
 			channel.connect();

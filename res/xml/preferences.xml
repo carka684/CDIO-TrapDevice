@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <ListPreference
+        android:key="CommunicatorClient_Channel"
+        android:title="Communication Channel"
+        android:dialogTitle="Communication Channel"
+        android:entries="@array/pref_channels_entries"
+        android:entryValues="@array/pref_channels_values"
+        android:defaultValue="edu.wildlifesecurity.trapdevice.communicatorclient.impl.InternetChannel" />
+    
+    <EditTextPreference
+        android:key="CommunicatorClient_ServerIdentifier"
+        android:defaultValue="192.168.2.10"
+        android:title="Server IP"
+        android:summary="The internet address of the server" />
+        
+</PreferenceScreen>
