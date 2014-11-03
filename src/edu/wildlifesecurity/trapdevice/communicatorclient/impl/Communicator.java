@@ -54,7 +54,7 @@ public class Communicator extends AbstractComponent implements
 						
 					}catch(Exception ex){
 						ex.printStackTrace();
-						log.error("Error in CommunicatorClient. Couldn't serialize configuration: " + ex.getMessage());
+						error("Error in CommunicatorClient. Couldn't serialize configuration: " + ex.getMessage());
 					}
 				}
 			});

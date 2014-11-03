@@ -74,6 +74,9 @@ public class InternetChannel extends AbstractChannel {
 					writer = new PrintWriter(socket.getOutputStream(), true);
 					reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					
+					// Send HANDSHAKE_REQ
+					sendMessage(new Message(0, Message.Commands.HANDSHAKE_REQ.toString()));
+					
 					String message;
 					while ((message = reader.readLine()) != null) {
 
@@ -81,9 +84,6 @@ public class InternetChannel extends AbstractChannel {
 						eventDispatcher.dispatch(
 			            		new MessageEvent(MessageEvent.getEventType(message.split(",")[0]), 
 			            				new Message(message, 0)));
-						
-						writer.write(message.toUpperCase() + "\n");
-						writer.flush();
 					}
 					
 				}catch (IOException ex){
@@ -105,7 +105,8 @@ public class InternetChannel extends AbstractChannel {
 
 	@Override
 	public void sendMessage(Message message) {
-		writer.write(message.getMessage());
+		writer.write(message.getMessage() + "\n");
+		writer.flush();
 	}
 
 }
