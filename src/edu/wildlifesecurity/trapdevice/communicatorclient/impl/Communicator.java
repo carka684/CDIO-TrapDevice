@@ -93,4 +93,10 @@ public class Communicator extends AbstractComponent implements
 		sendMessage(new Message(0, Message.Commands.LOG + "," + prio + "," + message));
 	}
 
+	@Override
+	public Map<String, Object> getConfiguration() {
+		return configuration;
+	}
+
+	
 }

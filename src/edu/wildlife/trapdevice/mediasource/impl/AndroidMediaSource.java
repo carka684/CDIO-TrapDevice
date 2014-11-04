@@ -45,7 +45,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 			    takeSnapshot();
 			    System.out.println("Took photo");
 			  }
-			}, (Integer)configuration.get("MediaSource_FrameRate"), (Integer)configuration.get("MediaSource_FrameRate"));
+			}, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 	}
 	
 	@Override
