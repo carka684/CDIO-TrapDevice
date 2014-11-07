@@ -1,7 +1,8 @@
 package edu.wildlifesecurity.trapdevice;
 
 
-import java.util.List;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -9,23 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.highgui.VideoCapture;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.video.BackgroundSubtractorMOG;
-
-import edu.wildlife.trapdevice.mediasource.impl.AndroidMediaSource;
-import edu.wildlifesecurity.framework.IEventHandler;
-import edu.wildlifesecurity.framework.ISubscription;
-import edu.wildlifesecurity.framework.SurveillanceClientManager;
-import edu.wildlifesecurity.framework.mediasource.IMediaSource;
-import edu.wildlifesecurity.framework.mediasource.MediaEvent;
-import edu.wildlifesecurity.trapdevice.R;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -33,6 +17,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import edu.wildlife.trapdevice.mediasource.impl.AndroidMediaSource;
+import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.SurveillanceClientManager;
+import edu.wildlifesecurity.framework.detection.IDetection;
+import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
+import edu.wildlifesecurity.framework.identification.IIdentification;
+import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
+import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 
 public class MainActivity extends Activity {
 	
@@ -42,9 +35,16 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_trap_device);
-	    //System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
+	    System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
 	    
-	    /*IMediaSource mediaSource = new AndroidMediaSource();
+	    IMediaSource mediaSource = new AndroidMediaSource();
+	    IDetection detectionComponent = new DefaultDetection();
+	    IIdentification identificationComponent = new HOGIdentification();
+	    identificationComponent.init();
+	    
+	    //getAssets().open("classifier1.txt");
+	    identificationComponent.loadClassifierFromFile("classifier1.txt");
+	    
 	    mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 
 			@Override
@@ -67,8 +67,8 @@ public class MainActivity extends Activity {
 	    	
 	    });
 	    
-	    SurveillanceClientManager manager = new SurveillanceClientManager(mediaSource, null, null, null);
-	    manager.start();*/
+	    SurveillanceClientManager manager = new SurveillanceClientManager(mediaSource, detectionComponent, identificationComponent, null);
+	    manager.start();
 	}
 	
 	public void onStartServiceBtnClick(View view){
