@@ -3,7 +3,7 @@
     tools:context="com.example.trapdevice.TrapDevice" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/IdentifiedImage1"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Settings"/>
