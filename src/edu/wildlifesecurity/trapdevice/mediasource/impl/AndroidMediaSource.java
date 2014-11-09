@@ -1,4 +1,4 @@
-package edu.wildlife.trapdevice.mediasource.impl;
+package edu.wildlifesecurity.trapdevice.mediasource.impl;
 
 import java.util.List;
 import java.util.Timer;

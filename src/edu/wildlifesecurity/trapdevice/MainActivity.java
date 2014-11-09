@@ -1,6 +1,9 @@
 package edu.wildlifesecurity.trapdevice;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import android.app.Activity;
@@ -19,13 +22,15 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG;
 
-import edu.wildlife.trapdevice.mediasource.impl.AndroidMediaSource;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.SurveillanceClientManager;
+import edu.wildlifesecurity.framework.detection.DetectionEvent;
+import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 import edu.wildlifesecurity.trapdevice.R;
+import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -33,6 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -41,34 +47,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    setContentView(R.layout.activity_trap_device);
-	    //System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
-	    
-	    /*IMediaSource mediaSource = new AndroidMediaSource();
-	    mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
-
-			@Override
-			public void handle(final MediaEvent event) {
-				
-				runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						
-						Bitmap bm = Bitmap.createBitmap(event.getImage().cols(), event.getImage().rows(),	Bitmap.Config.ARGB_8888);
-						Utils.matToBitmap(event.getImage(), bm);
-						ImageView iv = (ImageView) findViewById(R.id.imageView1);
-						iv.setImageBitmap(bm);
-					}
-
-				});
-
-			}
-	    	
-	    });
-	    
-	    SurveillanceClientManager manager = new SurveillanceClientManager(mediaSource, null, null, null);
-	    manager.start();*/
+	    setContentView(R.layout.activity_trap_device);    
 	}
 	
 	public void onStartServiceBtnClick(View view){
@@ -110,19 +89,19 @@ public class MainActivity extends Activity {
 	        service = b.getService();
 	        ((TextView)findViewById(R.id.statusTextBox)).setText(((TextView)findViewById(R.id.statusTextBox)).getText() + "\nConnected!");
 	        
-	        if(service.mediaSource != null){
-		        service.mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+	        if(service.detection != null){
+		        service.detection.addEventHandler(DetectionEvent.NEW_DETECTION, new IEventHandler<DetectionEvent>(){
 	
 					@Override
-					public void handle(final MediaEvent event) {
+					public void handle(final DetectionEvent event) {
 						
 						runOnUiThread(new Runnable() {
 	
 							@Override
 							public void run() {
 								
-								Bitmap bm = Bitmap.createBitmap(event.getImage().cols(), event.getImage().rows(),	Bitmap.Config.ARGB_8888);
-								Utils.matToBitmap(event.getImage(), bm);
+								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
+								Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
 								iv.setImageBitmap(bm);
 							}
