@@ -1,10 +1,7 @@
 package edu.wildlifesecurity.trapdevice;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.List;
+import org.opencv.android.Utils;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -12,25 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.highgui.VideoCapture;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.video.BackgroundSubtractorMOG;
-
-import edu.wildlifesecurity.framework.IEventHandler;
-import edu.wildlifesecurity.framework.ISubscription;
-import edu.wildlifesecurity.framework.SurveillanceClientManager;
-import edu.wildlifesecurity.framework.detection.DetectionEvent;
-import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
-import edu.wildlifesecurity.framework.mediasource.IMediaSource;
-import edu.wildlifesecurity.framework.mediasource.MediaEvent;
-import edu.wildlifesecurity.trapdevice.R;
-import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -38,7 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.detection.DetectionEvent;
 
 public class MainActivity extends Activity {
 	
