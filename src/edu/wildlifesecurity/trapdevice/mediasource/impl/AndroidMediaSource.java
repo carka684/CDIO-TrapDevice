@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -12,9 +11,7 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
-import android.graphics.Bitmap;
 import android.view.View;
-import android.widget.ImageView;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
@@ -22,7 +19,6 @@ import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
-import edu.wildlifesecurity.trapdevice.R;
 
 public class AndroidMediaSource extends AbstractComponent implements
 		IMediaSource {
@@ -59,6 +55,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 	public Mat takeSnapshot() {
 		snapShotGray();
 		dispatcher.dispatch(new MediaEvent(MediaEvent.NEW_SNAPSHOT, image));
+		
 		return image;
 	}
 	
@@ -110,6 +107,5 @@ public class AndroidMediaSource extends AbstractComponent implements
 		
 		mCamera.release();
 	}
-
 
 }
