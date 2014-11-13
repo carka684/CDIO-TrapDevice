@@ -11,6 +11,7 @@ import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
 import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
@@ -31,6 +32,7 @@ public class SurveillanceService extends Service {
 	public IDetection detection;
 	public IIdentification identification;
 	public ICommunicatorClient communicator;
+	public KalmanTracking tracker;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
@@ -47,10 +49,11 @@ public class SurveillanceService extends Service {
 		started = true;
 		
 		// Create components
-		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
+		mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
+		tracker = new KalmanTracking();
 		
 		// Load communicator pre configuration
 		Map<String,Object> preconfig = new HashMap<String,Object>();
@@ -60,7 +63,7 @@ public class SurveillanceService extends Service {
 		communicator.loadConfiguration(preconfig);
 		
 		// Create manager
-		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator);
+		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator, tracker);
 		manager.start();
 	}
 	

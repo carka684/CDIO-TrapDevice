@@ -19,6 +19,7 @@ import android.widget.TextView;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.identification.IdentificationEvent;
+import edu.wildlifesecurity.framework.tracking.TrackingEvent;
 
 public class MainActivity extends Activity {
 	
@@ -69,7 +70,33 @@ public class MainActivity extends Activity {
 	        service = b.getService();
 	        ((TextView)findViewById(R.id.statusTextBox)).setText(((TextView)findViewById(R.id.statusTextBox)).getText() + "\nConnected!");
 	        
+	        if(service.tracker != null)
+	        {
+	        	service.tracker.addEventHandler(TrackingEvent.NEW_TRACK, new IEventHandler<TrackingEvent>(){
+	        		
+					@Override
+					public void handle(final TrackingEvent event) {
+						
+						runOnUiThread(new Runnable() {
+	
+							@Override
+							public void run() {
+								
+								Bitmap bm = Bitmap.createBitmap(event.getCapture().image.height(), event.getCapture().image.width(),Bitmap.Config.ARGB_8888);
+								Utils.matToBitmap(event.getCapture().image, bm);
+								ImageView iv = (ImageView) findViewById(R.id.imageView1);
+								iv.setImageBitmap(bm);
+							}
+	
+						});
+	
+					}
+			    	
+			    });
+	        }
 	        if(service.detection != null){
+	
+	        			
 		        service.detection.addEventHandler(DetectionEvent.NEW_DETECTION, new IEventHandler<DetectionEvent>(){
 	
 					@Override
@@ -80,10 +107,10 @@ public class MainActivity extends Activity {
 							@Override
 							public void run() {
 								
-								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
-								Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
-								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								iv.setImageBitmap(bm);
+								//Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
+								//Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
+								//ImageView iv = (ImageView) findViewById(R.id.imageView1);
+								//iv.setImageBitmap(bm);
 							}
 	
 						});
