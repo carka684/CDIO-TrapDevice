@@ -48,6 +48,7 @@ public class SurveillanceService extends Service {
 		
 		// Create components
 		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
+		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
