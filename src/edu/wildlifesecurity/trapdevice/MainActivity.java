@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -20,6 +22,7 @@ import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.identification.IdentificationEvent;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
+
 
 public class MainActivity extends Activity {
 	
@@ -106,13 +109,30 @@ public class MainActivity extends Activity {
 	
 							@Override
 							public void run() {
+								/*
+								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
 								
-								//Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
-								//Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
-								//ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								//iv.setImageBitmap(bm);
+								Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
+								
+								Canvas drawing = new Canvas();
+								drawing.setBitmap(bm);
+								for(int i = 0; i < event.getDetectionResult().regions.size(); i++)
+								{
+									float left = event.getDetectionResult().regions.get(i).x;
+									float top = event.getDetectionResult().regions.get(i).y;
+									float bottom = top + event.getDetectionResult().regions.get(i).height;
+									float right = left + event.getDetectionResult().regions.get(i).width;
+									
+									Paint paint = new Paint();
+									paint.setARGB(255, 20, 250, 250);
+									paint.setStyle(Paint.Style.STROKE);
+									drawing.drawRect(left, top, right, bottom, paint);
+								}
+								ImageView iv = (ImageView) findViewById(R.id.imageView1);
+								iv.setImageBitmap(bm);
+							*/
 							}
-	
+							
 						});
 	
 					}

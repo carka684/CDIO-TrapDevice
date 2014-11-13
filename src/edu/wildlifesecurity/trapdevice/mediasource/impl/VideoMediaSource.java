@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.highgui.VideoCapture;
+import org.opencv.imgproc.Imgproc;
 
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
@@ -61,9 +61,11 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	public Mat takeSnapshot() {
 	
 		Bitmap bmp = retriever.getFrameAtTime(timeOffset,MediaMetadataRetriever.OPTION_CLOSEST);
-		Mat frame = new Mat();
 		
-		Utils.bitmapToMat(bmp, frame);
+		Mat frame = new Mat();
+		Mat frameTemp = new Mat();
+		Utils.bitmapToMat(bmp, frameTemp);
+		Imgproc.cvtColor(frameTemp,frame, Imgproc.COLOR_BGRA2GRAY);
 		timeOffset += frameRate * 1000; // Convert from ms to us
 		
 		// Dispatch event
