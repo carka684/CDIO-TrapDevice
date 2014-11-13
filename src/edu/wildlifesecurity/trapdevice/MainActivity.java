@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
 			    	
 			    });
 			}
-	        if(service.identification != null){
+	        /*if(service.identification != null){
 		        service.identification.addEventHandler(IdentificationEvent.NEW_IDENTIFICATION, new IEventHandler<IdentificationEvent>(){
 	
 		        	private int count = 0;
@@ -132,7 +132,7 @@ public class MainActivity extends Activity {
 					}
 			    	
 			    });
-			}
+			}*/
 	    }
 
 		@Override

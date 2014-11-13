@@ -13,6 +13,7 @@ import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
+import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,7 +47,7 @@ public class SurveillanceService extends Service {
 		started = true;
 		
 		// Create components
-		mediaSource = new AndroidMediaSource();
+		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
