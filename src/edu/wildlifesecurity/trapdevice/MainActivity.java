@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
 			    });
 	        }
 	        if(service.detection != null){
-	
+	        	//TEst
 	        			
 		        service.detection.addEventHandler(DetectionEvent.NEW_DETECTION, new IEventHandler<DetectionEvent>(){
 	
