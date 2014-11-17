@@ -89,47 +89,16 @@ public class MainActivity extends Activity {
 								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
 								iv.setImageBitmap(bm);
-								
-//								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-//								Bitmap bitmap = iv.getDrawingCache();
-//								Canvas canvas = new Canvas();
-//
-//								canvas.setBitmap(bitmap);
-//								float left = event.getCapture().getRegion().x;
-//								float top = event.getCapture().getRegion().y;
-//								float bottom = top + event.getCapture().getRegionImage().cols();
-//								float right = left + event.getCapture().getRegionImage().rows();
-//								//System.out.println("(" + left + "," + top + ") " + "(" + right  + "," + bottom + ")");
-//								Paint paint = new Paint();
-//								paint.setARGB(255, 20, 250, 250);
-//								paint.setStyle(Paint.Style.STROKE);
-//								canvas.drawRect(left, top, right, bottom, paint);
-//								iv.setImageBitmap(bitmap);
-//								System.out.println(bitmap.getWidth() + " " + bitmap.getHeight());
-								
-								
-//								Bitmap bm = Bitmap.createBitmap(event.getCapture().getRegionImage().cols(), 
-//										event.getCapture().getRegionImage().rows(),	Bitmap.Config.ARGB_8888);
-//								Utils.matToBitmap(event.getCapture().getRegionImage(), bm);
-//								iv.setImageBitmap(Bitmap.createScaledBitmap(bm, 600, 600, false));
-//								try {Thread.sleep(300);
-//				                } catch (InterruptedException e) {
-//				                    // TODO Auto-generated catch block
-//				                    e.printStackTrace();
-//				                }
 							}
 						});
 					}
 			    });
 	        }
 	        if(service.detection != null){
-	
-	        			
 		        service.detection.addEventHandler(DetectionEvent.NEW_DETECTION, new IEventHandler<DetectionEvent>(){
 	
 					@Override
 					public void handle(final DetectionEvent event) {
-						
 						runOnUiThread(new Runnable() {
 	
 							@Override
@@ -139,30 +108,11 @@ public class MainActivity extends Activity {
 								
 								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								iv.setImageBitmap(bm);
-								
-								
-								
-
-//								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().getRawDetection().cols(), 
-//										event.getDetectionResult().getRawDetection().rows(),	Bitmap.Config.ARGB_8888);
-//								
-//								Utils.matToBitmap(event.getDetectionResult().getRawDetection(), bm);
-//								
-//								Canvas drawing = new Canvas();
-//								drawing.setBitmap(bm);
-//								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-//								iv.setImageBitmap(bm);
-//								iv.buildDrawingCache();
-//								System.out.println(bm.getWidth() + " " + bm.getHeight());
-
-							
+								iv.setImageBitmap(bm);							
 							}
 							
 						});
-	
 					}
-			    	
 			    });
 			}
 	        /*if(service.identification != null){
