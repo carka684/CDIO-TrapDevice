@@ -48,7 +48,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 			    takeSnapshot();
 			    System.out.println("Took photo");
 			  }
-			}, frameRate, frameRate);
+			}, 100, 100);
 
 	}
 	

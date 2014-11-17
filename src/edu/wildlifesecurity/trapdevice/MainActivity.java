@@ -1,7 +1,7 @@
 package edu.wildlifesecurity.trapdevice;
 
 
-import org.opencv.android.Utils;
+import org.opencv.core.Scalar;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -20,18 +19,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
-import edu.wildlifesecurity.framework.identification.IdentificationEvent;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
 
 
 public class MainActivity extends Activity {
 	
 	private SurveillanceService service;
+	private Drawer drawer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    setContentView(R.layout.activity_trap_device);    
+	    setContentView(R.layout.activity_trap_device);
+	    
 	}
 	
 	public void onStartServiceBtnClick(View view){
@@ -85,16 +85,41 @@ public class MainActivity extends Activity {
 							@Override
 							public void run() {
 								
-								Bitmap bm = Bitmap.createBitmap(event.getCapture().image.height(), event.getCapture().image.width(),Bitmap.Config.ARGB_8888);
-								Utils.matToBitmap(event.getCapture().image, bm);
+								drawer.addRect(event.getCapture().getRegion(),event.getCapture().getClassification());
+								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
 								iv.setImageBitmap(bm);
+								
+//								ImageView iv = (ImageView) findViewById(R.id.imageView1);
+//								Bitmap bitmap = iv.getDrawingCache();
+//								Canvas canvas = new Canvas();
+//
+//								canvas.setBitmap(bitmap);
+//								float left = event.getCapture().getRegion().x;
+//								float top = event.getCapture().getRegion().y;
+//								float bottom = top + event.getCapture().getRegionImage().cols();
+//								float right = left + event.getCapture().getRegionImage().rows();
+//								//System.out.println("(" + left + "," + top + ") " + "(" + right  + "," + bottom + ")");
+//								Paint paint = new Paint();
+//								paint.setARGB(255, 20, 250, 250);
+//								paint.setStyle(Paint.Style.STROKE);
+//								canvas.drawRect(left, top, right, bottom, paint);
+//								iv.setImageBitmap(bitmap);
+//								System.out.println(bitmap.getWidth() + " " + bitmap.getHeight());
+								
+								
+//								Bitmap bm = Bitmap.createBitmap(event.getCapture().getRegionImage().cols(), 
+//										event.getCapture().getRegionImage().rows(),	Bitmap.Config.ARGB_8888);
+//								Utils.matToBitmap(event.getCapture().getRegionImage(), bm);
+//								iv.setImageBitmap(Bitmap.createScaledBitmap(bm, 600, 600, false));
+//								try {Thread.sleep(300);
+//				                } catch (InterruptedException e) {
+//				                    // TODO Auto-generated catch block
+//				                    e.printStackTrace();
+//				                }
 							}
-	
 						});
-	
 					}
-			    	
 			    });
 	        }
 	        if(service.detection != null){
@@ -109,28 +134,29 @@ public class MainActivity extends Activity {
 	
 							@Override
 							public void run() {
-								/*
-								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().rawDetection.cols(), event.getDetectionResult().rawDetection.rows(),	Bitmap.Config.ARGB_8888);
+								drawer = new Drawer();
+								drawer.setBackground(event.getDetectionResult().getRawDetection());
 								
-								Utils.matToBitmap(event.getDetectionResult().rawDetection, bm);
-								
-								Canvas drawing = new Canvas();
-								drawing.setBitmap(bm);
-								for(int i = 0; i < event.getDetectionResult().regions.size(); i++)
-								{
-									float left = event.getDetectionResult().regions.get(i).x;
-									float top = event.getDetectionResult().regions.get(i).y;
-									float bottom = top + event.getDetectionResult().regions.get(i).height;
-									float right = left + event.getDetectionResult().regions.get(i).width;
-									
-									Paint paint = new Paint();
-									paint.setARGB(255, 20, 250, 250);
-									paint.setStyle(Paint.Style.STROKE);
-									drawing.drawRect(left, top, right, bottom, paint);
-								}
+								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
 								iv.setImageBitmap(bm);
-							*/
+								
+								
+								
+
+//								Bitmap bm = Bitmap.createBitmap(event.getDetectionResult().getRawDetection().cols(), 
+//										event.getDetectionResult().getRawDetection().rows(),	Bitmap.Config.ARGB_8888);
+//								
+//								Utils.matToBitmap(event.getDetectionResult().getRawDetection(), bm);
+//								
+//								Canvas drawing = new Canvas();
+//								drawing.setBitmap(bm);
+//								ImageView iv = (ImageView) findViewById(R.id.imageView1);
+//								iv.setImageBitmap(bm);
+//								iv.buildDrawingCache();
+//								System.out.println(bm.getWidth() + " " + bm.getHeight());
+
+							
 							}
 							
 						});
