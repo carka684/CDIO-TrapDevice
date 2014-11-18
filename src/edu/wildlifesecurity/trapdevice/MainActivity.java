@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 	
 							@Override
 							public void run() {		
-								drawer.addRect(event.getCapture().getRegion(),event.getCapture().getClassification());
+								drawer.addRect(event.getRegion(),event.getCapture().classification);
 								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
 								iv.setImageBitmap(bm);
@@ -113,47 +113,6 @@ public class MainActivity extends Activity {
 					}
 			    });
 			}
-	        /*if(service.identification != null){
-		        service.identification.addEventHandler(IdentificationEvent.NEW_IDENTIFICATION, new IEventHandler<IdentificationEvent>(){
-	
-		        	private int count = 0;
-		        	
-					@Override
-					public void handle(final IdentificationEvent event) {
-						
-						runOnUiThread(new Runnable() {
-	
-							@Override
-							public void run() {
-								
-								Bitmap bm = Bitmap.createBitmap(event.getResult().getImage().cols(), event.getResult().getImage().rows(),	Bitmap.Config.ARGB_8888);
-								Utils.matToBitmap(event.getResult().getImage(), bm);
-								ImageView iv = null;
-								switch(count % 4){
-								case 0:
-									iv = (ImageView) findViewById(R.id.IdentifiedImage1);
-									break;
-								case 1:
-									iv = (ImageView) findViewById(R.id.IdentifiedImage2);
-									break;
-								case 2:
-									iv = (ImageView) findViewById(R.id.IdentifiedImage3);
-									break;
-								case 3:
-									iv = (ImageView) findViewById(R.id.IdentifiedImage4);
-									break;
-								}
-								count++;
-								
-								iv.setImageBitmap(bm);
-							}
-	
-						});
-	
-					}
-			    	
-			    });
-			}*/
 	    }
 
 		@Override

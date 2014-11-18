@@ -28,7 +28,7 @@ public class Drawer{
 	{
 		Imgproc.cvtColor(background, image, Imgproc.COLOR_GRAY2BGR);
 	}
-	public void addRect(Rect rect, int classification)
+	public void addRect(Rect rect, Classes classification)
 	{
 		Core.rectangle(image, rect.tl(), rect.br(),getColor(classification),5);
 	}
@@ -38,24 +38,19 @@ public class Drawer{
 		Utils.matToBitmap(image, bm);
 		return bm;
 	}
-	private Scalar getColor(int classification)
+	private Scalar getColor(Classes classification)
 	{
+		
 		Scalar color;
-		switch (classification) {
-		case 0 :
+		if(classification == Classes.HUMAN)
 			color = new Scalar(255,0,0); 
-			break;
-		case 1 :
+		else if(classification == Classes.RHINO)
 			color = new Scalar(0,255,0);
-			break;
-		case 2 :
+		else if(classification == Classes.UNIDENTIFIED)
 			color = new Scalar(0,0,255);
-			break;
-
-		default:
+		else
 			color = new Scalar(125,125,125);
-			break;
-		}
+
 		return color;
 	}
 }
