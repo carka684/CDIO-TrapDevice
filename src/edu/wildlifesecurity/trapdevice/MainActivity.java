@@ -31,7 +31,6 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_trap_device);
-	    
 	}
 	
 	public void onStartServiceBtnClick(View view){
@@ -83,8 +82,7 @@ public class MainActivity extends Activity {
 						runOnUiThread(new Runnable() {
 	
 							@Override
-							public void run() {
-								
+							public void run() {		
 								drawer.addRect(event.getCapture().getRegion(),event.getCapture().getClassification());
 								Bitmap bm = drawer.getBitmap();
 								ImageView iv = (ImageView) findViewById(R.id.imageView1);
