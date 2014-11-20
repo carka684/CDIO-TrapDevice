@@ -15,7 +15,6 @@ import android.graphics.Bitmap;
 public class Drawer{
 	Mat image;
 	
-	
 	public Drawer(Mat background)
 	{
 		Imgproc.cvtColor(background, image, Imgproc.COLOR_GRAY2BGR);

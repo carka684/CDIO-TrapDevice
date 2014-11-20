@@ -3,6 +3,7 @@ package edu.wildlifesecurity.trapdevice;
 
 import org.opencv.core.Scalar;
 
+import android.R.menu;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,6 +27,8 @@ public class MainActivity extends Activity {
 	
 	private SurveillanceService service;
 	private Drawer drawer;
+	private boolean showRaw = true;
+	private Menu menu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +70,9 @@ public class MainActivity extends Activity {
 							@Override
 							public void run() {		
 								drawer.addRect(event.getRegion(),event.getCapture().classification);
-								Bitmap bm = drawer.getBitmap();
-								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								iv.setImageBitmap(bm);
+								//Bitmap bm = drawer.getBitmap();
+								//ImageView iv = (ImageView) findViewById(R.id.imageView1);
+								//iv.setImageBitmap(bm);
 							}
 						});
 					}
@@ -84,12 +87,18 @@ public class MainActivity extends Activity {
 	
 							@Override
 							public void run() {
+								if(drawer != null)
+								{
+									Bitmap bm = drawer.getBitmap();
+									ImageView iv = (ImageView) findViewById(R.id.imageView1);
+									iv.setImageBitmap(bm);		
+								}
 								drawer = new Drawer();
-								drawer.setBackground(event.getDetectionResult().getRawDetection());
-								
-								Bitmap bm = drawer.getBitmap();
-								ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								iv.setImageBitmap(bm);							
+								if(showRaw)
+									drawer.setBackground(event.getDetectionResult().getRawDetection());
+								else
+									drawer.setBackground(event.getDetectionResult().getOriginalImage());
+														
 							}
 							
 						});
@@ -102,7 +111,9 @@ public class MainActivity extends Activity {
 	    public void onServiceDisconnected(ComponentName className) {
 			service = null;
 			//temp.removeHandler();
+			menu.findItem(R.id.serviceConnected).setTitle("Connect"); // FUngerar icke!
 			((TextView)findViewById(R.id.statusTextBox)).setText(((TextView)findViewById(R.id.statusTextBox)).getText() + "\nDisconnected!");
+			onCreateOptionsMenu(menu);
 	    }
 
 	  };
@@ -111,6 +122,7 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.trap_device, menu);
+		this.menu = menu;
 		return true;
 	}
 
@@ -144,7 +156,11 @@ public class MainActivity extends Activity {
 			stopService(i); 
 			return true;
 		}
-		
+		if (id == R.id.swapBackground) {
+			showRaw = !showRaw;
+			//TODO: Switch some global variable
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 }
