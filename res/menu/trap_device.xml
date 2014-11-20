@@ -7,5 +7,15 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Settings"/>
-
+    
+    <item
+        android:id="@+id/start"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="Start"/>
+    <item
+        android:id="@+id/stop"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="Stop"/>
 </menu>

@@ -33,23 +33,6 @@ public class MainActivity extends Activity {
 	    setContentView(R.layout.activity_trap_device);
 	}
 	
-	public void onStartServiceBtnClick(View view){
-		// use this to start and trigger a service
-		Intent i= new Intent(this, SurveillanceService.class);
-		// potentially add data to the intent
-		i.putExtra("KEY1", "Value to be used by the service");
-		startService(i); 
-		bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-	}
-	
-	public void onStopServiceBtnClick(View view){
-		// use this to start and trigger a service
-		Intent i= new Intent(this, SurveillanceService.class);
-		// potentially add data to the intent
-		i.putExtra("KEY1", "Value to be used by the service");
-		unbindService(mConnection);
-		stopService(i); 
-	}
 	
 	/*@Override
 	protected void onResume() {
@@ -143,6 +126,25 @@ public class MainActivity extends Activity {
             startActivity(intent);
 			return true;
 		}
+		if (id == R.id.start) {
+			// use this to start and trigger a service
+			Intent i= new Intent(this, SurveillanceService.class);
+			// potentially add data to the intent
+			i.putExtra("KEY1", "Value to be used by the service");
+			startService(i); 
+			bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+			return true;
+		}		
+		if (id == R.id.stop) {
+			// use this to start and trigger a service
+			Intent i= new Intent(this, SurveillanceService.class);
+			// potentially add data to the intent
+			i.putExtra("KEY1", "Value to be used by the service");
+			unbindService(mConnection);
+			stopService(i); 
+			return true;
+		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 }
