@@ -23,11 +23,17 @@
         android:showAsAction="always"
         android:title="Swap"/>
      <item
+        android:id="@+id/showTracking"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="track" />
+     <item
         android:id="@+id/serviceConnected"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="No connection"
      	android:visible="true"
         android:enabled="false" />
+      
           
 </menu>
