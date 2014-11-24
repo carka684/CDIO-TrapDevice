@@ -34,5 +34,10 @@ public abstract class AbstractChannel {
 	 * Sends a string message through the channel to the TrapDevice that is contained in the Message instance.
 	 */
 	abstract void sendMessage(Message message);
+	
+	/**
+	 * Disposes the channel
+	 */
+	abstract void dispose();
 
 }

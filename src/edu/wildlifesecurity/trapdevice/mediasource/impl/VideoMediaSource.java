@@ -77,6 +77,9 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 
 	@Override
 	public void destroy() {
+		timer.cancel();
+		timer.purge();
+		
 		retriever.release();
 	}
 

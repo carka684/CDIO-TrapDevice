@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.widget.Toast;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
@@ -62,7 +63,13 @@ public class InternetChannel extends AbstractChannel {
 							System.out.println("Connection failed, sleeps for 3 sec and tries again...");
 							Thread.sleep(3000);
 							
-						} catch (InterruptedException e1) { }
+						} catch (InterruptedException e1) {
+							// Do nothing
+							return;
+						}
+					} catch (IllegalStateException e){
+						System.out.println("Connection failed, the ip address needs to be of the format x.x.x.x:xxxx");
+						return;
 					}
 				}
 				
@@ -79,7 +86,7 @@ public class InternetChannel extends AbstractChannel {
 					
 					String message;
 					while ((message = reader.readLine()) != null) {
-
+						
 						// New message arrived, tell listeners!
 						eventDispatcher.dispatch(
 			            		new MessageEvent(MessageEvent.getEventType(message.split(",")[0]), 
@@ -107,6 +114,17 @@ public class InternetChannel extends AbstractChannel {
 	public void sendMessage(Message message) {
 		writer.write(message.getMessage() + "\n");
 		writer.flush();
+	}
+	
+	@Override
+	public void dispose(){
+		if(socket != null && (socket.isBound() || socket.isConnected()))
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// Error when closing the socket. Do nothing
+			}
+		connectingThread.interrupt();
 	}
 
 }

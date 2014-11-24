@@ -98,5 +98,9 @@ public class Communicator extends AbstractComponent implements
 		return configuration;
 	}
 
+	@Override
+	public void dispose(){
+		channel.dispose();
+	}
 	
 }

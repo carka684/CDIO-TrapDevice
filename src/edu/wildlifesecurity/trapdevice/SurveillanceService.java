@@ -12,6 +12,7 @@ import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
+import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
 import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
@@ -48,6 +49,9 @@ public class SurveillanceService extends Service {
 	private void startService(){
 		started = true;
 		
+		// Inject dependencies
+		SerializableCapture.encoder = new PngEncoder();
+		
 		// Create components
 //		mediaSource = new AndroidMediaSource();
 		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
@@ -71,7 +75,7 @@ public class SurveillanceService extends Service {
 	
     @Override
     public void onDestroy() {
-    	mediaSource.destroy();
+    	manager.stop();
     	
         // Tell the user we stopped.
         Toast.makeText(this, "Service stopped", Toast.LENGTH_SHORT).show();
