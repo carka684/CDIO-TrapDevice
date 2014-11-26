@@ -65,7 +65,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		Mat frame = new Mat();
 		Mat frameTemp = new Mat();
 		Utils.bitmapToMat(bmp, frameTemp);
-		Imgproc.cvtColor(frameTemp,frame, Imgproc.COLOR_BGRA2GRAY);
+		Imgproc.cvtColor(frameTemp,frame, Imgproc.COLOR_BGRA2BGR);
 		timeOffset += frameRate * 1000; // Convert from ms to us
 		
 		// Dispatch event

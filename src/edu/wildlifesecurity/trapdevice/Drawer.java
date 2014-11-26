@@ -25,7 +25,10 @@ public class Drawer{
 	}
 	public void setBackground(Mat background)
 	{
-		Imgproc.cvtColor(background, image, Imgproc.COLOR_GRAY2BGR);
+		if(background.type() == CvType.CV_8UC1) // If background is gray, convert it to BGR
+			Imgproc.cvtColor(background, image, Imgproc.COLOR_GRAY2BGR);
+		else 
+			image = background;
 	}
 	public void addRect(Rect rect, Classes classification)
 	{

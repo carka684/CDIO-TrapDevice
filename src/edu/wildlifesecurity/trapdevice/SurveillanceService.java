@@ -53,7 +53,6 @@ public class SurveillanceService extends Service {
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-//		mediaSource = new AndroidMediaSource();
 		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
 		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
