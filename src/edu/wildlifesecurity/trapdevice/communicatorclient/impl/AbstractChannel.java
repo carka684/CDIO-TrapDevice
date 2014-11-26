@@ -11,13 +11,16 @@ import edu.wildlifesecurity.framework.MessageEvent;
 
 /**
  * Represents a communication channel. A channel could be for example sms or internet.
+ * TODO: Handle lost connection
  */
 public abstract class AbstractChannel {
 	
 	protected Map<String, Object> configuration;
+	protected ILogger log;
 	
-	protected AbstractChannel(Map<String, Object> config){
+	protected AbstractChannel(Map<String, Object> config, ILogger logger){
 		this.configuration = config;
+		this.log = logger;
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import android.util.Base64;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.ILogger;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.Message;
 import edu.wildlifesecurity.framework.MessageEvent;
@@ -21,7 +22,8 @@ public class Communicator extends AbstractComponent implements
 		ICommunicatorClient {
 	
 	private AbstractChannel channel;
-
+	private boolean isConnected = false; 
+	
 	@Override
 	public void init(){
 		
@@ -29,8 +31,8 @@ public class Communicator extends AbstractComponent implements
 			
 			// Read from android configuration which channel to use
 			Class<?> cl = Class.forName(configuration.get("CommunicatorClient_Channel").toString());
-			Constructor<?> cons = cl.getConstructor(Map.class);
-			channel = (AbstractChannel) cons.newInstance(configuration);
+			Constructor<?> cons = cl.getConstructor(Map.class, ILogger.class);
+			channel = (AbstractChannel) cons.newInstance(configuration, log);
 		
 			// Start try to connect to server
 			channel.connect();
@@ -52,15 +54,17 @@ public class Communicator extends AbstractComponent implements
 						
 						loadConfiguration(config);
 						
+						isConnected = true;
+						
 					}catch(Exception ex){
 						ex.printStackTrace();
-						error("Error in CommunicatorClient. Couldn't serialize configuration: " + ex.getMessage());
+						log.error("Error in CommunicatorClient. Couldn't serialize configuration: " + ex.getMessage());
 					}
 				}
 			});
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Unexpected error in CommunicatorClient: " + e.getMessage());
 		}
 	}
 	
@@ -91,6 +95,11 @@ public class Communicator extends AbstractComponent implements
 	
 	private void sendLogMessage(String prio, String message){
 		sendMessage(new Message(0, Message.Commands.LOG + "," + prio + "," + message));
+	}
+	
+	@Override
+	public boolean isConnected(){
+		return isConnected;
 	}
 
 	@Override

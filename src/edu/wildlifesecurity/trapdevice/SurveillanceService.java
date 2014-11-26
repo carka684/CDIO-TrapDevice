@@ -67,8 +67,11 @@ public class SurveillanceService extends Service {
 			preconfig.put(entry.getKey(), entry.getValue());
 		communicator.loadConfiguration(preconfig);
 		
+		// Create client logger
+		ClientLogger logger = new ClientLogger(communicator, this);
+		
 		// Create manager
-		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator, tracker);
+		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator, tracker, logger);
 		manager.start();
 	}
 	

@@ -25,8 +25,8 @@ import edu.wildlifesecurity.framework.MessageEvent;
  */
 public class InternetChannel extends AbstractChannel {
 
-	public InternetChannel(Map<String, Object> config) {
-		super(config);
+	public InternetChannel(Map<String, Object> config, ILogger logger) {
+		super(config, logger);
 	}
 
 	private EventDispatcher<MessageEvent> eventDispatcher = new EventDispatcher<MessageEvent>();
@@ -60,15 +60,15 @@ public class InternetChannel extends AbstractChannel {
 					} catch (IOException e) {
 						try {
 							// If it failed, sleep for a while and try again
-							System.out.println("Connection failed, sleeps for 3 sec and tries again...");
-							Thread.sleep(3000);
+							log.warn("Connection failed, sleeps for 20 sec and tries again...");
+							Thread.sleep(20000);
 							
 						} catch (InterruptedException e1) {
 							// Do nothing
 							return;
 						}
 					} catch (IllegalStateException e){
-						System.out.println("Connection failed, the ip address needs to be of the format x.x.x.x:xxxx");
+						log.error("Connection failed, the ip address needs to be of the format x.x.x.x:xxxx");
 						return;
 					}
 				}
@@ -94,7 +94,7 @@ public class InternetChannel extends AbstractChannel {
 					}
 					
 				}catch (IOException ex){
-					System.out.println("Error in InternetChannel: " + ex.getMessage());
+					log.error("Error in InternetChannel: " + ex.getMessage());
 				}	
 				
 			}

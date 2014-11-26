@@ -2,6 +2,7 @@
 <project name="Trapdevice.fetchFramework" default="fetchFramework" basedir=".">
   <target name ="fetchFramework" description="Fetches the latest build of Framework">
   	<ant antfile="../CDIO-Framework/build.xml" target="makejar" dir="../CDIO-Framework" />
+  	<delete file="libs/Framework.jar" failonerror="false"/>
     <copy file="../CDIO-Framework/Framework.jar" todir="libs" />
   </target>
 </project>

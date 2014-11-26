@@ -42,6 +42,11 @@
             android:label="Settings" >
         </activity>
         
+        <activity
+            android:name=".LogDialog"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        
     </application>
 
 </manifest>
