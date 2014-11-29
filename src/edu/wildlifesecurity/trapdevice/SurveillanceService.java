@@ -25,7 +25,11 @@ import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
 import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -62,11 +66,14 @@ public class SurveillanceService extends Service {
 	private void startService(){
 		started = true;
 		
+		// Create persisitent notification
+		createPersisitentNotification();
+		
 		// Inject dependencies
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
+		mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
 		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
@@ -126,6 +133,9 @@ public class SurveillanceService extends Service {
     public void onDestroy() {
     	manager.stop();
     	
+    	// Remove persistent notification
+    	removePersisitentNotification();
+    	
         // Tell the user we stopped.
         Toast.makeText(this, "Service stopped", Toast.LENGTH_SHORT).show();
     }
@@ -163,6 +173,32 @@ public class SurveillanceService extends Service {
         }
     }
     
+	private void createPersisitentNotification() //Persistent notification 
+	{
+	    Intent intent = new Intent(this, MainActivity.class);
+	    intent.setAction(Intent.ACTION_MAIN);
+	    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+	    PendingIntent pendingIntent = PendingIntent.getActivity(this, 01, intent, 0);
+	    
+	    Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        builder.setContentTitle("TrapDevice");
+        builder.setContentText("TrapDevice is running");
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.wildlifesecurity_icon);
+        builder.setAutoCancel(false);
+        builder.setOngoing(true);
+        builder.setPriority(0);
+        
+        Notification notification = builder.build();
+        NotificationManager notificationManager = 
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 
+        notificationManager.notify(01, notification);
+	}
+    
+	private void removePersisitentNotification(){
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(01);
+	}
 	
 	@Override
 	public IBinder onBind(Intent arg0) {

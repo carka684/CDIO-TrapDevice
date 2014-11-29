@@ -8,15 +8,10 @@
         android:showAsAction="never"
         android:title="Settings"/>
     <item
-        android:id="@+id/start"
+        android:id="@+id/startStop"
         android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="Start"/>
-    <item
-        android:id="@+id/stop"
-        android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="Stop"/>
+        android:title=""
+        android:showAsAction="always"/>
      <item
         android:id="@+id/swapBackground"
         android:orderInCategory="100"

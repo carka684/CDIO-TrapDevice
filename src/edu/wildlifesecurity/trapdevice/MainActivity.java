@@ -1,27 +1,19 @@
 package edu.wildlifesecurity.trapdevice;
 
 
-import org.opencv.core.Scalar;
-
-import android.R.menu;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
@@ -34,44 +26,22 @@ public class MainActivity extends Activity {
 	private boolean showRaw = true;
 	private boolean showTrack = true;
 	private Menu menu;
-	
-	public void notificationHandler() //Persistent notification 
-	{
-		setContentView(R.layout.activity_trap_device);
-	    Intent intent = new Intent(this, MainActivity.class);
-	    intent.setAction(Intent.ACTION_MAIN);
-	    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-	    PendingIntent pendingIntent = PendingIntent.getActivity(this, 01, intent, 0);
-	    Notification.Builder builder = new Notification.Builder(getApplicationContext());
-        builder.setContentTitle("TrapDevice");
-        builder.setContentText("TrapDevice is running");
-        builder.setContentIntent(pendingIntent);
-        //builder.setTicker("Starting TrapDevice); 
-        builder.setSmallIcon(R.drawable.wildlifesecurity_icon);
-        builder.setAutoCancel(true);
-        builder.setOngoing(true);
-        builder.setPriority(0);
-        Notification notification = builder.build();
-        NotificationManager notificationManager = 
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 
-        notificationManager.notify(01, notification);
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_trap_device);
 	}
 	
 	
 	
 	@Override
 	protected void onResume() {
-	   super.onResume();
-	   notificationHandler();
+		super.onResume();	
+		
 	    //Intent intent= new Intent(this, SurveillanceService.class);
 		//bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-      
-	  }
+	}
 /*
 	@Override
 	protected void onPause() {
@@ -85,9 +55,7 @@ public class MainActivity extends Activity {
 	    public void onServiceConnected(ComponentName className, IBinder binder) {
 			SurveillanceService.SurveillanceServiceBinder b = (SurveillanceService.SurveillanceServiceBinder) binder;
 	        service = b.getService();
-	        menu.findItem(R.id.serviceConnected).setTitle("Connected"); //set no connection to connected
-	        //((TextView)findViewById(R.id.statusTextBox)).setText(((TextView)findViewById(R.id.statusTextBox)).getText() + "\nConnected!");
-	        
+	        //menu.findItem(R.id.serviceConnected).setTitle("Connected"); //set no connection to connected
 	        
 	        if(service.tracker != null)
 	        {
@@ -102,9 +70,6 @@ public class MainActivity extends Activity {
 							public void run() {		
 								if(showTrack)
 								drawer.addRect(event.getRegion(),event.getCapture().classification);
-								//Bitmap bm = drawer.getBitmap();
-								//ImageView iv = (ImageView) findViewById(R.id.imageView1);
-								//iv.setImageBitmap(bm);
 							}
 						});
 					}
@@ -139,27 +104,26 @@ public class MainActivity extends Activity {
 			}
 	    }
 		
-		
-
 		@Override
 	    public void onServiceDisconnected(ComponentName className) {
 			service = null;
-			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotificationManager.cancel(01);
-			//temp.removeHandler();
-			//((TextView)findViewById(R.id.statusTextBox)).setText(((TextView)findViewById(R.id.statusTextBox)).getText() + "\nDisconnected!");
-			
 	    }
 
 	  };
-	  
-	  
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.trap_device, menu);
 		this.menu = menu;
+		
+		// Update start/stop button
+		MenuItem startStopMenuItem = menu.findItem(R.id.startStop);
+		if(isMyServiceRunning(SurveillanceService.class))
+			startStopMenuItem.setTitle("Stop");
+		else
+			startStopMenuItem.setTitle("Start");
+		
 		return true;
 	}
 
@@ -175,17 +139,27 @@ public class MainActivity extends Activity {
             startActivity(intent);
 			return true;
 		}
-		if (id == R.id.start) {
-			menu.findItem(R.id.serviceConnected).setTitle("Connecting"); //set no connection to connecting
-			// use this to start and trigger a service
-			Intent i= new Intent(this, SurveillanceService.class);
-			// potentially add data to the intent
-			i.putExtra("KEY1", "Value to be used by the service");
-			startService(i); 
-			bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+		if (id == R.id.startStop) {
+			MenuItem startStopMenuItem = menu.findItem(R.id.startStop);
+			if(isMyServiceRunning(SurveillanceService.class)){
+				// Stop service if running
+				Intent i= new Intent(this, SurveillanceService.class);
+				unbindService(mConnection);
+				stopService(i);
+				startStopMenuItem.setTitle("Start");
+				
+			}else{
+				// Start service / bind service
+				Intent i= new Intent(this, SurveillanceService.class);
+				startService(i); 
+				bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+				
+				startStopMenuItem.setTitle("Stop");
+				
+			}
 			return true;
 		}		
-		if (id == R.id.stop) {
+		/*if (id == R.id.stop) {
 			
 			// use this to start and trigger a service
 			Intent i= new Intent(this, SurveillanceService.class);
@@ -197,7 +171,7 @@ public class MainActivity extends Activity {
 			mNotificationManager.cancel(01);
 			
 			return true;
-		}
+		}*/
 		if (id == R.id.swapBackground) {
 			showRaw = !showRaw;
 			//TODO: Switch some global variable
@@ -209,5 +183,15 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private boolean isMyServiceRunning(Class<?> serviceClass) {
+	    ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (serviceClass.getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 }
