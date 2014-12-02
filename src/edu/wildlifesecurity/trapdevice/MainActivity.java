@@ -144,7 +144,8 @@ public class MainActivity extends Activity {
 			if(isMyServiceRunning(SurveillanceService.class)){
 				// Stop service if running
 				Intent i= new Intent(this, SurveillanceService.class);
-				unbindService(mConnection);
+				if(service != null)
+					unbindService(mConnection);
 				stopService(i);
 				startStopMenuItem.setTitle("Start");
 				
