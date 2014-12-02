@@ -63,7 +63,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
 		Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY);	
-		Core.flip(image.t(), image, 1);
+		//Core.flip(image.t(), image, 1);
 	}
 	
 	private void snapShot(View view){
