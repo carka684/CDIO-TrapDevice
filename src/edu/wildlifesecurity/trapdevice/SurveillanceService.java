@@ -88,6 +88,7 @@ public class SurveillanceService extends Service {
 		
 		// Load communicator pre configuration
 		Map<String,Object> preconfig = new HashMap<String,Object>();
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		for(Entry<String, ?> entry : sharedPref.getAll().entrySet())
 			preconfig.put(entry.getKey(), entry.getValue());

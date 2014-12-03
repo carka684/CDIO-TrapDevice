@@ -11,7 +11,7 @@
     
     <EditTextPreference
         android:key="CommunicatorClient_ServerIdentifier"
-        android:defaultValue="192.168.2.10"
+        android:defaultValue="192.168.2.10:9090"
         android:title="Server IP"
         android:summary="The internet address of the server" />
         
