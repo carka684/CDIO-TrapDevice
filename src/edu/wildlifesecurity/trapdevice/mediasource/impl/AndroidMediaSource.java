@@ -124,8 +124,10 @@ public class AndroidMediaSource extends AbstractComponent implements
 	public void destroy() {
 		timer.cancel();
 		timer.purge();
-		backgroundThread.interrupt();
-		
+		if(backgroundThread != null)
+		{
+			backgroundThread.interrupt();
+		}
 		if(mCamera != null && mCamera.isOpened())
 			mCamera.release();
 	}
