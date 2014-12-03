@@ -2,9 +2,7 @@ package edu.wildlifesecurity.trapdevice.mediasource.impl;
 
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
@@ -29,6 +27,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 	private Mat image;
 	
 	private Timer timer = new Timer();
+	private Thread backgroundThread;
 	
 	@Override
 	public void init(){
@@ -36,14 +35,35 @@ public class AndroidMediaSource extends AbstractComponent implements
 		setupCamera();
 		
 		// Starts timer to take pictures at a configurable rate
-		timer.scheduleAtFixedRate(new TimerTask() {
+	/*	timer.scheduleAtFixedRate(new TimerTask()
+		{
 			  @Override
 			  public void run() {
 			    takeSnapshot();
 			    System.out.println("Took photo");
 			  }
-			}, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		}, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+	*/
+		backgroundThread = new Thread(new Runnable(){
+			@Override
+			public void run() {
+				while(true)
+				{
+					takeSnapshot();
+					System.out.println("Took photo");
+					
+					// check if interrupted
+					if(backgroundThread.isInterrupted())
+						break;
+				}
+							
+			}
+			
+		});
+		backgroundThread.start();
 	}
+	
+	
 	
 	@Override
 	public ISubscription addEventHandler(EventType type,
@@ -53,7 +73,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 
 	@Override
 	public Mat takeSnapshot() {
-		snapShotGray();
+		snapShot();
 		dispatcher.dispatch(new MediaEvent(MediaEvent.NEW_SNAPSHOT, image));
 		
 		return image;
@@ -66,7 +86,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 		//Core.flip(image.t(), image, 1);
 	}
 	
-	private void snapShot(View view){
+	private void snapShot(){
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);		
 	}
@@ -104,6 +124,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 	public void destroy() {
 		timer.cancel();
 		timer.purge();
+		backgroundThread.interrupt();
 		
 		if(mCamera != null && mCamera.isOpened())
 			mCamera.release();
