@@ -73,8 +73,8 @@ public class SurveillanceService extends Service {
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-		//mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
-		mediaSource = new AndroidMediaSource();
+		mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
+		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
@@ -191,9 +191,10 @@ public class SurveillanceService extends Service {
         builder.setPriority(0);
         
         Notification notification = builder.build();
-        NotificationManager notificationManager = 
+        /*NotificationManager notificationManager = 
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 
-        notificationManager.notify(01, notification);
+        notificationManager.notify(01, notification);*/
+        startForeground(1, notification);
 	}
     
 	private void removePersisitentNotification(){

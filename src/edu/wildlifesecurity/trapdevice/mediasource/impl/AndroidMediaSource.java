@@ -29,6 +29,13 @@ public class AndroidMediaSource extends AbstractComponent implements
 	private Mat image;
 	
 	private Timer timer = new Timer();
+	private TimerTask task = new TimerTask() {
+		  @Override
+		  public void run() {				  
+			  takeSnapshot();
+			  System.out.println("Took photo");
+		  }
+		};
 	
 	@Override
 	public void init(){
@@ -36,13 +43,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 		setupCamera();
 		
 		// Starts timer to take pictures at a configurable rate
-		timer.scheduleAtFixedRate(new TimerTask() {
-			  @Override
-			  public void run() {
-			    takeSnapshot();
-			    System.out.println("Took photo");
-			  }
-			}, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 	}
 	
 	@Override
@@ -98,6 +99,12 @@ public class AndroidMediaSource extends AbstractComponent implements
 		image=Mat.eye(3,3,0);
 		mCamera.grab();
 		mCamera.retrieve(image, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGB);
+	}
+	
+	@Override
+	public void setConfigOption(String key, String value){
+		super.setConfigOption(key, value);
+		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 	}
 
 	@Override

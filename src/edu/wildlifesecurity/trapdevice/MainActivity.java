@@ -31,6 +31,11 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_trap_device);
+		
+		if(isMyServiceRunning(SurveillanceService.class)){
+			Intent intent= new Intent(this, SurveillanceService.class);
+			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 	
 	
@@ -41,6 +46,14 @@ public class MainActivity extends Activity {
 		
 	    //Intent intent= new Intent(this, SurveillanceService.class);
 		//bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if(service != null)
+			unbindService(mConnection);
 	}
 /*
 	@Override

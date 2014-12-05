@@ -22,6 +22,13 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	private EventDispatcher<MediaEvent> dispatcher = new EventDispatcher<MediaEvent>();
 	private MediaMetadataRetriever retriever;
 	private Timer timer = new Timer();
+	private TimerTask task = new TimerTask() {
+		  @Override
+		  public void run() {
+		    takeSnapshot();
+		    System.out.println("Took photo");
+		  }
+		};
 	private int timeOffset = 1;
 	private int frameRate;
 	
@@ -42,13 +49,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		frameRate = Integer.parseInt(configuration.get("MediaSource_FrameRate").toString());
 		
 		// Starts timer to take pictures at a configurable rate
-		timer.scheduleAtFixedRate(new TimerTask() {
-			  @Override
-			  public void run() {
-			    takeSnapshot();
-			    System.out.println("Took photo");
-			  }
-			}, 100, 100);
+		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 
 	}
 	
@@ -73,6 +74,12 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		
 		return frame;
 		
+	}
+	
+	@Override
+	public void setConfigOption(String key, String value){
+		super.setConfigOption(key, value);
+		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 	}
 
 	@Override
