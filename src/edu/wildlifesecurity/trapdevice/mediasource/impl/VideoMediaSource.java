@@ -72,18 +72,12 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	
 	@Override
 	public void setConfigOption(String key, String value){
-		System.out.println("HEEEJ");
 		super.setConfigOption(key, value);
 		if(isTimerStarted){
-			System.out.println("1!");
 			timer.cancel();
-			System.out.println("12!");
 			timer.purge();
-			System.out.println("123!");
 			timer = new Timer();
-			System.out.println("1234!");
 			timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
-			System.out.println("DONE!!");
 		}
 	}
 

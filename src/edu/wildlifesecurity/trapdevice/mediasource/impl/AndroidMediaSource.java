@@ -10,7 +10,6 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
-import android.view.View;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
@@ -28,14 +27,8 @@ public class AndroidMediaSource extends AbstractComponent implements
 	private Mat image;
 	
 	private Timer timer = new Timer();
+	private boolean isTimerStarted = false;
 	private Thread backgroundThread;
-	private TimerTask task = new TimerTask() {
-		  @Override
-		  public void run() {				  
-			  takeSnapshot();
-			  System.out.println("Took photo");
-		  }
-		};
 	
 	@Override
 	public void init(){
@@ -61,6 +54,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 		});
 		backgroundThread.start();
 		//timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		//isTimerStarted = true;
 	}
 	
 	
@@ -123,7 +117,12 @@ public class AndroidMediaSource extends AbstractComponent implements
 	@Override
 	public void setConfigOption(String key, String value){
 		super.setConfigOption(key, value);
-		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		if(isTimerStarted){
+			timer.cancel();
+			timer.purge();
+			timer = new Timer();
+			timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		}
 	}
 
 	@Override
@@ -136,6 +135,13 @@ public class AndroidMediaSource extends AbstractComponent implements
 		}
 		if(mCamera != null && mCamera.isOpened())
 			mCamera.release();
+	}
+	
+	private class MyTask extends TimerTask {
+	    public void run() {
+		    takeSnapshot();
+		    System.out.println("Took photo");
+	    }
 	}
 
 }
