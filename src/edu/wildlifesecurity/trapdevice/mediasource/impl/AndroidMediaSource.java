@@ -2,6 +2,7 @@ package edu.wildlifesecurity.trapdevice.mediasource.impl;
 
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
