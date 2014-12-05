@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import edu.wildlifesecurity.framework.SensorData;
 import edu.wildlifesecurity.framework.SurveillanceClientManager;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 import edu.wildlifesecurity.framework.detection.IDetection;
@@ -33,7 +34,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -49,7 +58,7 @@ public class SurveillanceService extends Service {
 	public IIdentification identification;
 	public ICommunicatorClient communicator;
 	public KalmanTracking tracker;
-	
+
 	private ClientLogger logger;
 	
 	@Override
@@ -95,7 +104,14 @@ public class SurveillanceService extends Service {
 		
 		// Create manager
 		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator, tracker, logger);
-		manager.start();
+		
+		// Start waiting for sensors..
+		// Starts manager when the accuarcy is < minAccuarcy  or after maxWaitTime (ms)
+		SensorListener sensorListener = new SensorListener(1000, 1000*30,8);
+        System.out.println("konstruktor");
+
+		sensorListener.startlistening();		
+		
 	}
 	
 	/**
@@ -209,6 +225,113 @@ public class SurveillanceService extends Service {
 		SurveillanceService getService() {
 			return SurveillanceService.this;
 		}
+	}
+	private class SensorListener implements LocationListener, SensorEventListener
+	{
+		public int heading;
+		public double[] GPSPosition;
+	    private SensorManager mSensorManager;
+	    private Sensor mAccelerometer,mField;
+	    private LocationManager locationManager;
+	    private long startTime;
+	    private long maxWaitTime;
+	    private long timeBetweenChecks;
+	    private int minAccuarcy;
+		public SensorListener(int timeBetweenChecks, long maxWaitTime, int minAccuarcy) {
+	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	        mField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	        this.maxWaitTime = maxWaitTime;
+	        this.timeBetweenChecks = timeBetweenChecks;
+	        this.minAccuarcy = minAccuarcy;
+		}
+		
+		public void startlistening()
+		{
+		    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, timeBetweenChecks, 0, this); //Updates GPS postion every 1 second
+	        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+	        mSensorManager.registerListener(this, mField, SensorManager.SENSOR_DELAY_UI);
+	        startTime = System.currentTimeMillis();
+	        System.out.println("start");
+		}
+		
+		float[] mGravity = null;
+		float[] mGeomagnetic = null;
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			 switch(event.sensor.getType()) {
+		        case Sensor.TYPE_ACCELEROMETER:
+		            mGravity = event.values.clone();
+		            break;
+		        case Sensor.TYPE_MAGNETIC_FIELD:
+		        	mGeomagnetic = event.values.clone();
+		            break;
+		        default:
+		            return;
+		        }
+		        
+		        if(mGravity != null && mGeomagnetic != null) {
+		            updateDirection();
+		        }
+		}
+	    private void updateDirection() {
+	        float[] temp = new float[9];
+	        float[] R = new float[9];
+	        //Load rotation matrix into R
+	        SensorManager.getRotationMatrix(temp, null, mGravity, mGeomagnetic);
+	        //Remap to camera's point-of-view
+	        SensorManager.remapCoordinateSystem(temp, SensorManager.AXIS_X, SensorManager.AXIS_Z, R);
+	        //Return the orientation values
+	        float[] values = new float[3];
+	        SensorManager.getOrientation(R, values);
+	        //Convert to degrees
+	        for (int i=0; i < values.length; i++) {
+	            Double degrees = (values[i] * 180) / Math.PI;
+	            values[i] = degrees.floatValue();
+	        }
+	        int heading = (int) values[0] + 180;	        
+	    }
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+		@Override
+		public void onLocationChanged(Location location) {
+			System.out.println("hej");
+			double latitude =  (location.getLatitude());
+			double longitude =  (location.getLongitude());
+			double accuarcy = location.getAccuracy();
+			double postion[] = {latitude,longitude,accuarcy};
+			this.GPSPosition = postion;
+			String s = "Latitude: " + latitude + ", Longitude: " + longitude + " accuary " + accuarcy; 
+			if(accuarcy < minAccuarcy  || maxWaitTime > (System.currentTimeMillis() - startTime))
+			{
+				System.out.println("Startar service efter:  " + (System.currentTimeMillis() - startTime));
+				locationManager.removeUpdates(this);
+				mSensorManager.unregisterListener(this);
+				SensorData.GPSPostion = getGPSPosition();
+				SensorData.heading = getHeading();
+				manager.start();
+			}
+		}
+		public double[] getGPSPosition()
+		{
+			return GPSPosition;
+		}
+		public int getHeading()
+		{
+			return heading;
+		}
+		
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+		@Override
+		public void onProviderEnabled(String provider) {}
+
+		@Override
+		public void onProviderDisabled(String provider) {}
+		
 	}
 
 }
