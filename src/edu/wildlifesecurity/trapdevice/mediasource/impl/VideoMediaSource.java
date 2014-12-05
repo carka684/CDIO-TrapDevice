@@ -22,13 +22,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	private EventDispatcher<MediaEvent> dispatcher = new EventDispatcher<MediaEvent>();
 	private MediaMetadataRetriever retriever;
 	private Timer timer = new Timer();
-	private TimerTask task = new TimerTask() {
-		  @Override
-		  public void run() {
-		    takeSnapshot();
-		    System.out.println("Took photo");
-		  }
-		};
+	private boolean isTimerStarted = false;
 	private int timeOffset = 1;
 	private int frameRate;
 	
@@ -49,8 +43,8 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		frameRate = Integer.parseInt(configuration.get("MediaSource_FrameRate").toString());
 		
 		// Starts timer to take pictures at a configurable rate
-		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
-
+		timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		isTimerStarted = true;
 	}
 	
 	@Override
@@ -78,8 +72,19 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	
 	@Override
 	public void setConfigOption(String key, String value){
+		System.out.println("HEEEJ");
 		super.setConfigOption(key, value);
-		timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		if(isTimerStarted){
+			System.out.println("1!");
+			timer.cancel();
+			System.out.println("12!");
+			timer.purge();
+			System.out.println("123!");
+			timer = new Timer();
+			System.out.println("1234!");
+			timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+			System.out.println("DONE!!");
+		}
 	}
 
 	@Override
@@ -88,6 +93,13 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		timer.purge();
 		
 		retriever.release();
+	}
+	
+	private class MyTask extends TimerTask {
+	    public void run() {
+		    takeSnapshot();
+		    System.out.println("Took photo");
+	    }
 	}
 
 }
