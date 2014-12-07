@@ -10,12 +10,14 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import edu.wildlifesecurity.framework.AbstractComponent;
+import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ILogger;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.Message;
 import edu.wildlifesecurity.framework.MessageEvent;
+import edu.wildlifesecurity.framework.communicatorclient.ConnectEvent;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 
 public class Communicator extends AbstractComponent implements
@@ -23,6 +25,7 @@ public class Communicator extends AbstractComponent implements
 	
 	private AbstractChannel channel;
 	private boolean isConnected = false; 
+	private EventDispatcher<ConnectEvent> connectionEventDispatcher = new EventDispatcher<ConnectEvent>();
 	
 	@Override
 	public void init(){
@@ -55,6 +58,7 @@ public class Communicator extends AbstractComponent implements
 						loadConfiguration(config);
 						
 						isConnected = true;
+						connectionEventDispatcher.dispatch(new ConnectEvent(ConnectEvent.CONNECTED, true));
 						
 					}catch(Exception ex){
 						ex.printStackTrace();
@@ -71,6 +75,11 @@ public class Communicator extends AbstractComponent implements
 	@Override
 	public ISubscription addEventHandler(EventType type, IEventHandler<MessageEvent> handler) {
 		return channel.addEventHandler(type, handler);
+	}
+	
+	@Override
+	public ISubscription addConnectionEventHandler(EventType type, IEventHandler<ConnectEvent> handler){
+		return connectionEventDispatcher.addEventHandler(type, handler);
 	}
 
 	@Override
