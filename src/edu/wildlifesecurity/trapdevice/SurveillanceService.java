@@ -8,24 +8,11 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import edu.wildlifesecurity.framework.SensorData;
-import edu.wildlifesecurity.framework.SurveillanceClientManager;
-import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
-import edu.wildlifesecurity.framework.detection.IDetection;
-import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
-import edu.wildlifesecurity.framework.identification.IIdentification;
-import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
-import edu.wildlifesecurity.framework.mediasource.IMediaSource;
-import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
-import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
-import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
-import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
-import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -43,10 +30,21 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+import edu.wildlifesecurity.framework.SensorData;
+import edu.wildlifesecurity.framework.SurveillanceClientManager;
+import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
+import edu.wildlifesecurity.framework.detection.IDetection;
+import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
+import edu.wildlifesecurity.framework.identification.IIdentification;
+import edu.wildlifesecurity.framework.identification.impl.HOGIdentification;
+import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
+import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
+import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
+import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
 
 public class SurveillanceService extends Service {
 	private final IBinder binder = new SurveillanceServiceBinder();
@@ -108,8 +106,6 @@ public class SurveillanceService extends Service {
 		// Start waiting for sensors..
 		// Starts manager when the accuarcy is < minAccuarcy  or after maxWaitTime (ms)
 		SensorListener sensorListener = new SensorListener(1000, 1000*30,8);
-        System.out.println("konstruktor");
-
 		sensorListener.startlistening();		
 		
 	}
@@ -245,6 +241,14 @@ public class SurveillanceService extends Service {
 	        this.maxWaitTime = maxWaitTime;
 	        this.timeBetweenChecks = timeBetweenChecks;
 	        this.minAccuarcy = minAccuarcy;
+	        
+	        Timer timer = new Timer();
+	        timer.schedule(new TimerTask() {
+	          @Override
+	          public void run() {
+	        	  stopListening();
+	          }
+	        }, 1000);
 		}
 		
 		public void startlistening()
@@ -290,14 +294,13 @@ public class SurveillanceService extends Service {
 	            Double degrees = (values[i] * 180) / Math.PI;
 	            values[i] = degrees.floatValue();
 	        }
-	        int heading = (int) values[0] + 180;	        
+	        this.heading = (int) values[0] + 180;	        
 	    }
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 		@Override
 		public void onLocationChanged(Location location) {
-			System.out.println("hej");
 			double latitude =  (location.getLatitude());
 			double longitude =  (location.getLongitude());
 			double accuarcy = location.getAccuracy();
@@ -305,14 +308,16 @@ public class SurveillanceService extends Service {
 			this.GPSPosition = postion;
 			String s = "Latitude: " + latitude + ", Longitude: " + longitude + " accuary " + accuarcy; 
 			if(accuarcy < minAccuarcy  || maxWaitTime > (System.currentTimeMillis() - startTime))
-			{
-				System.out.println("Startar service efter:  " + (System.currentTimeMillis() - startTime));
-				locationManager.removeUpdates(this);
-				mSensorManager.unregisterListener(this);
-				SensorData.GPSPostion = getGPSPosition();
-				SensorData.heading = getHeading();
-				manager.start();
-			}
+				stopListening();
+		}
+		public void stopListening()
+		{
+			System.out.println("Stopping");
+			locationManager.removeUpdates(this);
+			mSensorManager.unregisterListener(this);
+			SensorData.GPSPostion = getGPSPosition();
+			SensorData.heading = getHeading();
+			manager.start();
 		}
 		public double[] getGPSPosition()
 		{
