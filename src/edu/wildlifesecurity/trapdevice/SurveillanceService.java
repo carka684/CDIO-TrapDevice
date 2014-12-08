@@ -81,8 +81,8 @@ public class SurveillanceService extends Service {
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-		//mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
-		mediaSource = new AndroidMediaSource();
+		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
+		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
@@ -106,7 +106,7 @@ public class SurveillanceService extends Service {
 		manager = new SurveillanceClientManager(mediaSource, detection, identification, communicator, tracker, logger);
 		
 		// Start waiting for sensors..
-		// Starts manager when the accuarcy is < minAccuarcy  or after maxWaitTime (ms)
+		// Starts manager when the accuracy is < minAccuracy  or after maxWaitTime (ms)
 		SensorListener sensorListener = new SensorListener(1000, 1000*30,8);
 		sensorListener.startlistening();		
 		
@@ -235,15 +235,15 @@ public class SurveillanceService extends Service {
 	    private long startTime;
 	    private long maxWaitTime;
 	    private long timeBetweenChecks;
-	    private int minAccuarcy;
-		public SensorListener(int timeBetweenChecks, long maxWaitTime, int minAccuarcy) {
+	    private int minAccuracy;
+		public SensorListener(int timeBetweenChecks, long maxWaitTime, int minAccuracy) {
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	        mField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	        this.maxWaitTime = maxWaitTime;
 	        this.timeBetweenChecks = timeBetweenChecks;
-	        this.minAccuarcy = minAccuarcy;
+	        this.minAccuracy = minAccuracy;
 	        
 	        Timer timer = new Timer();
 	        timer.schedule(new TimerTask() {
@@ -310,7 +310,7 @@ public class SurveillanceService extends Service {
 			double postion[] = {latitude,longitude,accuarcy};
 			this.GPSPosition = postion;
 			String s = "Latitude: " + latitude + ", Longitude: " + longitude + " accuary " + accuarcy; 
-			if(accuarcy < minAccuarcy  || maxWaitTime > (System.currentTimeMillis() - startTime))
+			if(accuarcy < minAccuracy  || maxWaitTime > (System.currentTimeMillis() - startTime))
 				stopListening();
 		}
 		public void stopListening()
