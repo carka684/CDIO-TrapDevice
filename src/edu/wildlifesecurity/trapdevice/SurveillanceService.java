@@ -45,6 +45,7 @@ import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
 import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
 import edu.wildlifesecurity.trapdevice.communicatorclient.impl.Communicator;
 import edu.wildlifesecurity.trapdevice.mediasource.impl.AndroidMediaSource;
+import edu.wildlifesecurity.trapdevice.mediasource.impl.VideoMediaSource;
 
 public class SurveillanceService extends Service {
 	private final IBinder binder = new SurveillanceServiceBinder();
@@ -80,8 +81,8 @@ public class SurveillanceService extends Service {
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-		mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
-		//mediaSource = new AndroidMediaSource();
+		//mediaSource = new VideoMediaSource("/storage/sdcard0/2014_10_10_10_51_12.3gp");
+		mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
 		communicator =  new Communicator();
@@ -250,7 +251,7 @@ public class SurveillanceService extends Service {
 	          public void run() {
 	        	  stopListening();
 	          }
-	        }, 1000);
+	        }, maxWaitTime);
 		}
 		
 		public void startlistening()
