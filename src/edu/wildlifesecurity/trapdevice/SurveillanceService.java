@@ -227,8 +227,8 @@ public class SurveillanceService extends Service {
 	}
 	private class SensorListener implements LocationListener, SensorEventListener
 	{
-		public int heading;
-		public double[] GPSPosition;
+		public int heading = -1;
+		public double[] GPSPosition = {-1,-1};
 	    private SensorManager mSensorManager;
 	    private Sensor mAccelerometer,mField;
 	    private LocationManager locationManager;
@@ -318,19 +318,12 @@ public class SurveillanceService extends Service {
 			System.out.println("Stopping");
 			locationManager.removeUpdates(this);
 			mSensorManager.unregisterListener(this);
-			SensorData.GPSPostion = getGPSPosition();
-			SensorData.heading = getHeading();
+			SensorData.latitude = GPSPosition[0];
+			SensorData.longitude = GPSPosition[1];
+			SensorData.heading = heading;
 			manager.start();
 		}
-		public double[] getGPSPosition()
-		{
-			return GPSPosition;
-		}
-		public int getHeading()
-		{
-			return heading;
-		}
-		
+
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {}
 
