@@ -59,6 +59,9 @@ public class InternetChannel extends AbstractChannel {
 						
 					} catch (IOException e) {
 						try {
+							if(connectingThread.isInterrupted())
+								return;
+							
 							// If it failed, sleep for a while and try again
 							log.warn("Connection failed, sleeps for 20 sec and tries again...");
 							Thread.sleep(20000);
