@@ -43,9 +43,20 @@ public class MainActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_trap_device);
 
+		if(isMyServiceRunning(SurveillanceService.class)){
+			Intent intent= new Intent(this, SurveillanceService.class);
+			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 	
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if(service != null)
+			unbindService(mConnection);
+	}
 	
 	@Override
 	protected void onResume() {
@@ -173,9 +184,11 @@ public class MainActivity extends Activity{
 			if(isMyServiceRunning(SurveillanceService.class)){
 				// Stop service if running
 				Intent i= new Intent(this, SurveillanceService.class);
-				unbindService(mConnection);
+				if(service != null)
+					unbindService(mConnection);
 				stopService(i);
 				startStopMenuItem.setTitle("Start");
+				menu.findItem(R.id.serviceConnected).setTitle("NO CONNECTION");
 				
 			}else{
 				// Start service / bind service
