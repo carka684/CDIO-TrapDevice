@@ -30,6 +30,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -81,7 +82,9 @@ public class SurveillanceService extends Service {
 		SerializableCapture.encoder = new PngEncoder();
 		
 		// Create components
-		mediaSource = new VideoMediaSource("/storage/sdcard0/Camera1_2.mp4");
+		File extStore = Environment.getExternalStorageDirectory();
+		System.out.println(extStore.getAbsolutePath());
+		mediaSource = new VideoMediaSource("storage/sdcard0/camera1_2short.mp4");
 		//mediaSource = new AndroidMediaSource();
 		detection = new DefaultDetection();
 		identification = new HOGIdentification();
@@ -107,7 +110,10 @@ public class SurveillanceService extends Service {
 		
 		// Start waiting for sensors..
 		// Starts manager when the accuracy is < minAccuracy  or after maxWaitTime (ms)
-		SensorListener sensorListener = new SensorListener(1000, 1000*30,8);
+		int accuarcy = 8; 
+		int timeBetweenChecks = 1*1000; // in ms
+		int maxCheckTime = 1*1000;// in ms (30s is recommended)
+		SensorListener sensorListener = new SensorListener(timeBetweenChecks, maxCheckTime,accuarcy);
 		sensorListener.startlistening();		
 		
 	}
