@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.communicatorclient.ConnectEvent;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
 
@@ -42,9 +43,20 @@ public class MainActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_trap_device);
 
+		if(isMyServiceRunning(SurveillanceService.class)){
+			Intent intent= new Intent(this, SurveillanceService.class);
+			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 	
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if(service != null)
+			unbindService(mConnection);
+	}
 	
 	@Override
 	protected void onResume() {
@@ -66,7 +78,24 @@ public class MainActivity extends Activity{
 	    public void onServiceConnected(ComponentName className, IBinder binder) {
 			SurveillanceService.SurveillanceServiceBinder b = (SurveillanceService.SurveillanceServiceBinder) binder;
 	        service = b.getService();
-	        //menu.findItem(R.id.serviceConnected).setTitle("Connected"); //set no connection to connected
+	        
+	        // Update connection label
+	        updateConnectionLabel(service.communicator.isConnected());
+	        service.communicator.addConnectionEventHandler(ConnectEvent.CONNECTED, new IEventHandler<ConnectEvent>(){
+
+				@Override
+				public void handle(final ConnectEvent event) {
+					runOnUiThread(new Runnable(){
+
+						@Override
+						public void run() {
+							updateConnectionLabel(event.isConnected());
+						}
+						
+					});
+				}
+	        	
+	        });
 	        
 	        if(service.tracker != null)
 	        {
@@ -155,9 +184,11 @@ public class MainActivity extends Activity{
 			if(isMyServiceRunning(SurveillanceService.class)){
 				// Stop service if running
 				Intent i= new Intent(this, SurveillanceService.class);
-				unbindService(mConnection);
+				if(service != null)
+					unbindService(mConnection);
 				stopService(i);
 				startStopMenuItem.setTitle("Start");
+				menu.findItem(R.id.serviceConnected).setTitle("NO CONNECTION");
 				
 			}else{
 				// Start service / bind service
@@ -169,20 +200,7 @@ public class MainActivity extends Activity{
 				
 			}
 			return true;
-		}		
-		/*if (id == R.id.stop) {
-			
-			// use this to start and trigger a service
-			Intent i= new Intent(this, SurveillanceService.class);
-			// potentially add data to the intent
-			i.putExtra("KEY1", "Value to be used by the service");
-			unbindService(mConnection);
-			stopService(i); 
-			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotificationManager.cancel(01);
-			
-			return true;
-		}*/
+		}
 		if (id == R.id.swapBackground) {
 			showRaw = !showRaw;
 			//TODO: Switch some global variable
@@ -194,6 +212,13 @@ public class MainActivity extends Activity{
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void updateConnectionLabel(boolean isConnected){
+        if(isConnected)
+        	menu.findItem(R.id.serviceConnected).setTitle("CONNECTED"); //set no connection to connected
+        else
+        	menu.findItem(R.id.serviceConnected).setTitle("NO CONNECTION");
 	}
 	
 	private boolean isMyServiceRunning(Class<?> serviceClass) {
