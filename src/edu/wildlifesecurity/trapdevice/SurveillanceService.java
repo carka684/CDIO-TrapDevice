@@ -151,11 +151,12 @@ public class SurveillanceService extends Service {
 	
     @Override
     public void onDestroy() {
-    	manager.stop();
-    	
+    	if(manager != null)
+    		manager.stop();
+
     	// Remove persistent notification
     	removePersisitentNotification();
-    	
+
         // Tell the user we stopped.
         Toast.makeText(this, "Service stopped", Toast.LENGTH_SHORT).show();
     }

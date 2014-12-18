@@ -54,7 +54,7 @@ public class MainActivity extends Activity{
 	protected void onDestroy() {
 		super.onDestroy();
 		
-		if(service != null)
+		if(service != null && isMyServiceRunning(SurveillanceService.class))
 			unbindService(mConnection);
 	}
 	

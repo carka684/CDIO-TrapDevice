@@ -118,7 +118,8 @@ public class Communicator extends AbstractComponent implements
 
 	@Override
 	public void dispose(){
-		channel.dispose();
+		if(channel != null)
+			channel.dispose();
 	}
 	
 }
