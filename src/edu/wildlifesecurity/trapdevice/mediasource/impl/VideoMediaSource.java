@@ -21,7 +21,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 
 	private EventDispatcher<MediaEvent> dispatcher = new EventDispatcher<MediaEvent>();
 	private MediaMetadataRetriever retriever;
-	private Timer timer = new Timer();
+	private Timer timer;
 	private boolean isTimerStarted = false;
 	private int timeOffset = 1;
 	private int frameRate;
@@ -43,6 +43,7 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 		frameRate = Integer.parseInt(configuration.get("MediaSource_FrameRate").toString());
 		
 		// Starts timer to take pictures at a configurable rate
+		timer = new Timer();
 		timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
 		isTimerStarted = true;
 	}
@@ -55,18 +56,24 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 	@Override
 	public Mat takeSnapshot() {
 	
-		Bitmap bmp = retriever.getFrameAtTime(timeOffset,MediaMetadataRetriever.OPTION_CLOSEST);
-		
-		Mat frame = new Mat();
-		Mat frameTemp = new Mat();
-		Utils.bitmapToMat(bmp, frameTemp);
-		Imgproc.cvtColor(frameTemp,frame, Imgproc.COLOR_BGRA2BGR);
-		timeOffset += frameRate * 1000; // Convert from ms to us
-		
-		// Dispatch event
-		dispatcher.dispatch(new MediaEvent(MediaEvent.NEW_SNAPSHOT, frame));
-		
-		return frame;
+		try{
+			Bitmap bmp = retriever.getFrameAtTime(timeOffset,MediaMetadataRetriever.OPTION_CLOSEST);
+			
+			Mat frame = new Mat();
+			Mat frameTemp = new Mat();
+			Utils.bitmapToMat(bmp, frameTemp);
+			Imgproc.cvtColor(frameTemp,frame, Imgproc.COLOR_BGRA2BGR);
+			timeOffset += frameRate * 1000; // Convert from ms to us
+			
+			// Dispatch event
+			dispatcher.dispatch(new MediaEvent(MediaEvent.NEW_SNAPSHOT, frame));
+			
+			return frame;
+			
+		}catch(Exception e){
+			log.error("Unexpected error in VideoMediaSource: " + e.getMessage());
+			return new Mat();
+		}
 		
 	}
 	
@@ -83,9 +90,10 @@ public class VideoMediaSource extends AbstractComponent implements IMediaSource 
 
 	@Override
 	public void destroy() {
-		timer.cancel();
-		timer.purge();
-		
+		if(timer != null){
+			timer.cancel();
+			timer.purge();
+		}
 		retriever.release();
 	}
 	

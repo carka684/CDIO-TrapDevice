@@ -26,7 +26,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 	private VideoCapture mCamera;
 	private Mat image;
 	
-	private Timer timer = new Timer();
+	private Timer timer;
 	private boolean isTimerStarted = false;
 	private Thread backgroundThread;
 	
@@ -36,7 +36,7 @@ public class AndroidMediaSource extends AbstractComponent implements
 		setupCamera();
 		
 		// Starts timer to take pictures at a configurable rate
-		backgroundThread = new Thread(new Runnable(){
+		/*backgroundThread = new Thread(new Runnable(){
 			@Override
 			public void run() {
 				while(true)
@@ -52,9 +52,10 @@ public class AndroidMediaSource extends AbstractComponent implements
 			}
 			
 		});
-		backgroundThread.start();
-		//timer.scheduleAtFixedRate(task, Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
-		//isTimerStarted = true;
+		backgroundThread.start();*/
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new MyTask(), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()), Integer.parseInt(configuration.get("MediaSource_FrameRate").toString()));
+		isTimerStarted = true;
 	}
 	
 	
@@ -127,8 +128,10 @@ public class AndroidMediaSource extends AbstractComponent implements
 
 	@Override
 	public void destroy() {
-		timer.cancel();
-		timer.purge();
+		if(timer != null){
+			timer.cancel();
+			timer.purge();
+		}
 		if(backgroundThread != null)
 		{
 			backgroundThread.interrupt();

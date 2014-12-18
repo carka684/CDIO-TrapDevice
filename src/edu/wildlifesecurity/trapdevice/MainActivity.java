@@ -108,8 +108,8 @@ public class MainActivity extends Activity{
 	
 							@Override
 							public void run() {		
-								if(showTrack)
-								drawer.addRect(event.getRegion(),event.getCapture().classification);
+								if(showTrack && drawer != null)
+									drawer.addRect(event.getRegion(),event.getCapture().classification);
 							}
 						});
 					}
@@ -215,7 +215,9 @@ public class MainActivity extends Activity{
 	}
 	
 	private void updateConnectionLabel(boolean isConnected){
-        if(isConnected)
+        if(menu == null)
+        	return;
+		if(isConnected)
         	menu.findItem(R.id.serviceConnected).setTitle("CONNECTED"); //set no connection to connected
         else
         	menu.findItem(R.id.serviceConnected).setTitle("NO CONNECTION");
